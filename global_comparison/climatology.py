@@ -55,7 +55,13 @@ def mean_month(ds,time_col="time",):
 
     return ds
 
-def monthly_cycle(ds, time_col="time"):
+def calc_quantile(ds, quantile=0.95):
+    '''
+    '''
+    return ds.quantile(quantile, dim="month")
+
+
+def monthly_cycle(ds, time_col="time", quantile=0.95):
     '''
     Calculate the monthly cycle across time period of input object.
     
@@ -73,39 +79,43 @@ def monthly_cycle(ds, time_col="time"):
             "time" coordinate still contained within dataset but no longer attached to any data variables.
     '''
     time = ds[time_col].values
-    months = pd.DatetimeIndex(ds[time_col].values).month
+    months = ds[time_col].dt.month
 
-    if isinstance(ds, xr.core.dataset.Dataset):
-        dims_list = []
-        for dv in ds.data_vars:
-            dv_dims = list(ds[dv].dims)
-            if time_col in dv_dims:
-                i = dv_dims.index(time_col)
-                dv_dims[i] = "month"
+    # if isinstance(ds, xr.core.dataset.Dataset):
+    #     dims_list = []
+    #     for dv in ds.data_vars:
+    #         dv_dims = list(ds[dv].dims)
+    #         if time_col in dv_dims:
+    #             i = dv_dims.index(time_col)
+    #             dv_dims[i] = "month"
                 
-            dims_list.append(dv_dims)
-    else:
-        dims_list = [list(ds.dims)]
-        if time_col in ds.dims:
-            i = ds.dims.index(time_col)
-            dims_list[0][i] = "month"
+    #         dims_list.append(dv_dims)
+    # else:
+    #     dims_list = [list(ds.dims)]
+    #     if time_col in ds.dims:
+    #         i = ds.dims.index(time_col)
+    #         dims_list[0][i] = "month"
 
     ds_new  = ds.copy(deep=True)
     
-    ds_new  = ds_new.assign_coords(**{"month":(time_col,months)})
-    ds_new  = ds_new.swap_dims({time_col:"month"})
+    ds_new = ds_new.assign_coords(**{"month":(time_col, months)})
+    ds_new = ds_new.swap_dims({time_col:"month"})
     
-    group   = ds_new.groupby("month")
-    ds_mean = group.map(mean_month,**{"time_col":time_col})
+    ds_quantile = ds_new.groupby("month").map(calc_quantile, quantile = quantile)
     
-    if isinstance(ds,xr.core.dataset.Dataset):
-        for i,dv in enumerate(ds.data_vars):
-            if 'month' in ds_mean[dv].dims and 'month' not in dims_list[i]:
-                dims_list[i].insert(1, 'month')
-            ds_mean[dv] = ds_mean[dv].transpose(*dims_list[i])
-    else:
-        ds_mean = ds_mean.transpose(*dims_list[0])
+    #ds_mean = group.map(mean_month,**{"time_col":time_col})
     
-    ds_mean.attrs["timeframe"] = f"Climatology over time range: {time[0].astype(str)} - {time[-1].astype(str)}"
+    # if isinstance(ds,xr.core.dataset.Dataset):
+    #     for i,dv in enumerate(ds.data_vars):
+    #         if 'month' in ds_mean[dv].dims and 'month' not in dims_list[i]:
+    #             dims_list[i].insert(1, 'month')
+    #         ds_mean[dv] = ds_mean[dv].transpose(*dims_list[i])
+    # else:
+    #     ds_mean = ds_mean.transpose(*dims_list[0])
     
-    return ds_mean
+
+    time_as_strings = ds[time_col].dt.strftime("%Y-%m-%dT%H:%M:%S").sortby(time_col)
+    ds_quantile.attrs["timeframe"] = f"Climatology over time range: {time_as_strings.values[0]} - {time_as_strings.values[-1]}"
+    ds_quantile.attrs["quantile"] = f"Quantile calculated: {quantile} (i.e. {quantile*100.:.0f}% percentile)"
+    
+    return ds_quantile
