@@ -4,7 +4,7 @@ import xarray as xr
 from pathlib import Path
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
-from climatology import monthly_cycle
+from .climatology import monthly_cycle
 
 def define_path(model, scenario, base_path=Path("/home/users/rt17603/cop26_hackathons/project10/utci_projections_1deg"),
                 run="r1i1p1f1"):
