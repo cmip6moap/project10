@@ -1,3 +1,24 @@
+# Snakemake pipeline
+
+```
+source /gws/pw/j05/cop26_hackathons/bristol/activate-env
+
+snakemake -prk \
+-j 100 \
+--cluster-config slurm.json \
+--cluster "sbatch \
+  --job-name={cluster.name} \
+  --partition={cluster.partition} \
+  --nodes={cluster.nodes} \
+  --ntasks-per-node={cluster.ntask} \
+  --cpus-per-task={cluster.ncpu} \
+  --time={cluster.time} \
+  --mem={cluster.mem} \
+  --output={cluster.output}"
+```
+
+
+
 # Hackathon Project Template
 
 This is a template repo for hackathon projects. Click the (green) "Use this

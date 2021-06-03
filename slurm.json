@@ -1,0 +1,23 @@
+{
+        "__default__" :
+        {
+                "name": "{rule}",
+                "partition": "workshop",
+                "nodes": "1",
+                "ncpu": "1",
+                "ntask": "1",
+                "time": "01:00:00",
+                "mem": "2G",
+                "output": "job_reports/{rule}.out"
+        },
+        "utci_france" :
+        {
+                "name": "{rule}.{wildcards.franceindex}_{wildcards.model}_{wildcards.run}",
+                "output": "job_reports/{rule}.{wildcards.franceindex}_{wildcards.model}_{wildcards.run}.out"
+        },
+        "utci_all" :
+        {
+                "name": "{rule}.{allindex}_{wildcards.model}_{wildcards.run}",
+                "output": "job_reports/{rule}.{allindex}_{wildcards.model}_{wildcards.run}.out"
+        }
+}
