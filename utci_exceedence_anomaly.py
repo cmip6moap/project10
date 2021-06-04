@@ -14,13 +14,9 @@
 # IMPORT PYTHON LIBRARIES
 #------------------------------------------------------------------------------
 
-from itertools import chain
-from glob import glob
 import numpy as np
-import pandas as pd
 import xarray as xr
 import os, sys
-from pathlib import Path
 
 # Plotting libraries:
 import matplotlib
@@ -45,24 +41,18 @@ from cartopy.util import add_cyclic_point
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
-# Geo libraries:
-
-import geopandas as gp
-#import pooch
-#import pyproj
-#from shapely.geometry import Polygon
-#conda install -c conda-forge regionmask
-#pip install git+https://github.com/mathause/regionmask
-import regionmask
-
-from scipy import stats
-
 # Silence library version notifications
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
+
+print("cartopy   : ", cartopy.__version__) # cartopy   :  0.18.0
+print("matplotlib   : ", matplotlib.__version__) # matplotlib   :  3.3.4
+print("numpy   : ", np.__version__) # numpy   :  1.19.2
+print("xarray   : ", xr.__version__) # xarray   :  0.17.0
 
 #----------------------------------------------------------------------------
 # SETTINGS
@@ -227,20 +217,20 @@ plt.close('all')
 
 # Extract fraction of time UTCI is above threshold, weight and slice by latitude
 
-ssp126_utci_over_threshold_frac = (np.isfinite(ssp126_utci_over_threshold_mean)/len(ssp126_utci.time))*100.
-utci_over_threshold_frac_mean = utci_over_threshold_frac.mean('time') # time-averaged map
-utci_over_threshold_frac_weighted = utci_over_threshold_frac.weighted(weights)
-utci_over_threshold_frac_weighted_lat = utci_over_threshold_frac_weighted.mean('lon')
-utci_over_threshold_frac_weighted_lat_mean = utci_over_threshold_frac_weighted.mean('lon').mean('time')
-utci_over_threshold_frac_weighted_mean = utci_over_threshold_frac_weighted.mean(("lon", "lat"))
+#ssp126_utci_over_threshold_frac = (np.isfinite(ssp126_utci_over_threshold_mean)/len(ssp126_utci.time))*100.
+#utci_over_threshold_frac_mean = utci_over_threshold_frac.mean('time') # time-averaged map
+#utci_over_threshold_frac_weighted = utci_over_threshold_frac.weighted(weights)
+#utci_over_threshold_frac_weighted_lat = utci_over_threshold_frac_weighted.mean('lon')
+#utci_over_threshold_frac_weighted_lat_mean = utci_over_threshold_frac_weighted.mean('lon').mean('time')
+#utci_over_threshold_frac_weighted_mean = utci_over_threshold_frac_weighted.mean(("lon", "lat"))
 
 # SAVE: extracts to netCDF
 
-utci_over_threshold_mean.to_netcdf('global_over_32_mean.nc')
-utci_over_threshold_frac.to_netcdf('global_over_32_frac.nc')
-utci_over_threshold_frac_mean.to_netcdf('global_over_32_frac.nc')
-utci_over_threshold_frac_weighted_lat.to_netcdf('global_over_32_frac.nc')
-utci_over_threshold_frac_weighted_mean.to_netcdf('global_over_32_frac.nc')
+#utci_over_threshold_mean.to_netcdf('global_over_32_mean.nc')
+#utci_over_threshold_frac.to_netcdf('global_over_32_frac.nc')
+#utci_over_threshold_frac_mean.to_netcdf('global_over_32_frac.nc')
+#utci_over_threshold_frac_weighted_lat.to_netcdf('global_over_32_frac.nc')
+#utci_over_threshold_frac_weighted_mean.to_netcdf('global_over_32_frac.nc')
 
 #-----------------------------------------------------------------------------
 print('*** END')
