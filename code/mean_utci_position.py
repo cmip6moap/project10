@@ -6,7 +6,7 @@ import xarray as xr
 parser = argparse.ArgumentParser(description = "Extract monthly UTCI means for a location")
 parser.add_argument('--populated')
 parser.add_argument('--row', type=int)
-parser.add_argument('--netcdf')
+parser.add_argument('--netcdf', nargs="+")
 parser.add_argument('--outfile')
 
 
@@ -33,11 +33,17 @@ def mean_utci_position(utci, pop, row):
                 ))
     return(out)
 
-utci =  xr.open_mfdataset(args.netcdf, parallel=True)
 populated = pd.read_parquet(args.populated)
-# out = mean_utci_position(utci, populated, args.row)
 
-out = pd.DataFrame(data={'a':[1,2]})
+l = []
+for netcdf in args.netcdf:
+    print(netcdf)
+    utci =  xr.open_mfdataset(netcdf, parallel=True)
+    out = mean_utci_position(utci, populated, args.row)
+    out = out.assign(netcdf = netcdf)
+    l.append(out)
 
+out = pd.concat(l).reset_index()
 out.to_parquet(args.outfile)
+
 
