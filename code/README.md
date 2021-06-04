@@ -1,9 +1,6 @@
-# Any code that you created that doesn't sit within a Notebook
+# Code
 
-Could be Python or otherwise, for example larger data processing tasks that ran
-on the Scientific Analysis Servers, or batch processing performed on LOTUS
-
-Explain what the files are here:
+Includes code written within the hackathon including Python, R, bash (slurm) and some notebooks.
 
 era5_heat_comp/
  - author: Chris Smith
