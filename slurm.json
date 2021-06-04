@@ -10,14 +10,9 @@
                 "mem": "2G",
                 "output": "job_reports/{rule}.out"
         },
-        "utci_france" :
+        "utci_countries" :
         {
-                "name": "{rule}.{wildcards.franceindex}",
-                "output": "job_reports/{rule}.{wildcards.franceindex}.out"
-        },
-        "utci_all" :
-        {
-                "name": "{rule}.{wildcards.allindex}",
-                "output": "job_reports/{rule}.{wildcards.allindex}.out"
+                "name": "{rule}.{wildcards.country}",
+                "output": "job_reports/{rule}.{wildcards.country}.out"
         }
 }
