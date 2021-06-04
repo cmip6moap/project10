@@ -33,6 +33,7 @@ We require 3hrly data including insolation from historical data from 1985, and p
 * Calculate wet bulb temperatures
 * Calculate biases in reproducing historical records
 * Investigate the physiological response of bodies to these metrics
+* Compare the monthly 95th percentiles between historical values and future scenarios
 * Plot the projections in many and various ways
 * Calculate correlations between UTCI and GSAT 
 
