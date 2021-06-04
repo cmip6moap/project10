@@ -1,54 +1,45 @@
-# Hackathon Project Template
+# Project 10: Human heat stress in a warming world
 
-This is a template repo for hackathon projects. Click the (green) "Use this
-template" button at the top of the page to use it.
-
-There are also some example notebooks. Check our [Hackathon Resources](https://cmip6moap.github.io/resources/)
-page for further guidance, including our participant guide and recommendations
-for using Git and GitHub in your project team.
-
-This template repo was created for the [CMIP6 Data Hackathon](https://cmip6moap.github.io)
-by [James Thomas](https://github.com/jatonline) and [Will Seviour](https://github.com/wseviour).
-
-## Change this README!
-
-When you've used this template, remove the above text and replace with the
-below:
-
----
-
-# [Project title]
-
-[Short summary of the project]
+This project looks at how the heat stress metrics are projected to change under different future scenarios. We focus particularly on UTCI.
 
 ## Contributors
 
-* Contributors list
-* With links to GitHub profiles / institution pages, etc.
+* Lead: Chris Smith (@chrisroadmap) https://environment.leeds.ac.uk/see/staff/1542/dr-chris-smith
+* Charles H. Simpson (@C-H-Simpson)
+* Chloe Brimicombe
+* Claudia Di Napoli 
+* Gibran Hemani (@explodecomputer)
+* Laila Gohar (@lkgohar)
+* Lauren Burton 
+* Michael Taylor (@patternizer)
+* Rachel Tunnicliffe (@rt17603)
+* Robin Lamboll (@rlamboll) 
+* Seb Cole
 
 ## What was done
+UTCI in a few scenarios were calculated. Bias correction in this was begun. Various plots of the time evolution of this over the globe were made
 
 ### How we approached the problem and why
 
-[...]
+Traditional extremes of heat and other climate indices defined by the ETCCDI such as monthly maximum temperature or heatwave duration (Zhang et al., 2011) do not directly estimate the impacts on human welfare. Here we compute a metric of human heat stress, the Universal Thermal Climate Index (UTCI; Błazejczyk et al., 2013), using CMIP6 projections. We compare these to wet bulb temperatures across several models. 
 
 ### Data we used and how to obtain this
 
-* [...]
-* [...]
-* [...]
+We require 3hrly data including insolation from historical data from 1985, and projections from SSP5-8.5, SSP2-4.5 and SSP1-2.6 to 2100. Most calculations use processed monthly versions of this, focusing on either 95% high values or mean values. Models must include diffuse irradiance to calculate this. Chris collected a few such models and precalculated the UTCI data. Charles Simpson then calculated monthly 95th quantiles and mean data which was also put onto Jasmin. 
 
 ### What we did during the hackathon
 
-* [...]
-* [...]
-* [...]
+* Calculate UTCI monthly mean and 95%
+* Calculate wet bulb temperatures
+* Calculate biases in reproducing historical records
+* Investigate the physiological response of bodies to these metrics
+* Plot the projections in many and various ways
+* Calculate correlations between UTCI and GSAT 
 
 ### Outcomes
 
-* [...]
-* [...]
-* [...]
+* Many exciting graphs
+* Newfound appreciation for the difficulty of working on Jasmin
 
 ## About this repo
 
@@ -62,27 +53,20 @@ There are further `README` files in key directories.
 
 ### How to reproduce our outputs
 
-1. [...]
-2. [...]
-3. [...]
+1. Find all the data we used on Jasmin (it will probably have moved)
+2. Run all of the notebooks
 
 ### Repo structure
 
     .
     ├── notebooks
-    │   ├── [...].ipynb
-    │   └── [...].ipynb
     │           The Jupyter Notebooks that we created
     │
     ├── code
-    │   ├── [...].py
-    │   └── [...].py
     │           Any code (Python or otherwise) that we created that doesn't
     │           sit within a Notebook
     │
     ├── results
-    │   ├── [...].pdf
-    │   └── [...].png
     │           The key figures that we produced
     │
     ├── data
