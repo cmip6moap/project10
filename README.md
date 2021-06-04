@@ -7,10 +7,10 @@ This project looks at how the heat stress metrics are projected to change under 
 * Lead: Chris Smith (@chrisroadmap) https://environment.leeds.ac.uk/see/staff/1542/dr-chris-smith
 * Charles H. Simpson [@C-H-Simpson](https://github.com/C-H-Simpson)
 * Chloe Brimicombe
-* Claudia Di Napoli 
+* Claudia Di Napoli [@cladinapoli](https://github.com/cladinapoli) https://www.reading.ac.uk/geographyandenvironmentalscience/About/Staff/c-dinapoli.aspx
 * Gibran Hemani [@explodecomputer](https://github.com/explodecomputer)
 * Laila Gohar [@lkgohar](https://github.com/lkgohar)
-* Lauren Burton 
+* Lauren Burton [@eeleb](https://github.com/eeleb)
 * Michael Taylor [@patternizer](https://github.com/patternizer)
 * Rachel Tunnicliffe [@rt17603](https://github.com/rt17603)
 * Robin Lamboll [@rlamboll](https://github.com/rlamboll)
@@ -33,6 +33,7 @@ We require 3hrly data including insolation from historical data from 1985, and p
 * Calculate wet bulb temperatures
 * Calculate biases in reproducing historical records
 * Investigate the physiological response of bodies to these metrics
+* Compare the monthly 95th percentiles between historical values and future scenarios
 * Plot the projections in many and various ways
 * Calculate correlations between UTCI and GSAT 
 
