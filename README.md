@@ -5,15 +5,15 @@ This project looks at how the heat stress metrics are projected to change under 
 ## Contributors
 
 * Lead: Chris Smith (@chrisroadmap) https://environment.leeds.ac.uk/see/staff/1542/dr-chris-smith
-* Charles H. Simpson (@C-H-Simpson)
+* Charles H. Simpson [@C-H-Simpson](https://github.com/C-H-Simpson)
 * Chloe Brimicombe
 * Claudia Di Napoli 
-* Gibran Hemani (@explodecomputer)
-* Laila Gohar (@lkgohar)
+* Gibran Hemani [@explodecomputer](https://github.com/explodecomputer)
+* Laila Gohar [@lkgohar](https://github.com/lkgohar)
 * Lauren Burton 
-* Michael Taylor (@patternizer)
-* Rachel Tunnicliffe (@rt17603)
-* Robin Lamboll (@rlamboll) 
+* Michael Taylor [@patternizer](https://github.com/patternizer)
+* Rachel Tunnicliffe [@rt17603](https://github.com/rt17603)
+* Robin Lamboll [@rlamboll](https://github.com/rlamboll)
 * Seb Cole
 
 ## What was done
