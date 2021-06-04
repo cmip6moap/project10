@@ -1,4 +1,7 @@
 import os
+import re
+import numpy as np
+import pandas as pd
 import xarray as xr
 from pathlib import Path
 
@@ -9,7 +12,38 @@ def define_path(model, scenario, base_path=data_path, run="r1i1p1f1"):
     path = Path(os.path.join(base_path, model, scenario, run))
     return path
 
-def extract_data(model, scenario, run="r1i1p1f1", base_path=data_path, date_range=None, parameter="utci", resample="D", set_chunks=True):
+def extract_files(filenames, start, end):
+
+    # dateformat example "198501010300-198601010000"
+
+    # Expect input start and end date as string e.g. "2013" for now
+    start = pd.to_datetime(start)#, format="%Y")
+    end = pd.to_datetime(end)#, format="%Y")
+
+    filenames_match = []
+    for filename in filenames:
+        filename = str(filename)
+        try:
+            re_str = "\d{12}[-]\d{12}"
+            d = re.search(re_str, filename)
+            d = d.group() # Extract value from regular expression compiler
+        except AttributeError:
+                pass
+        else:
+            s = d.split('-')[0]
+            s = pd.to_datetime(s, format="%Y%m%d%H%M%S")
+            ## TODO: Could also incorporate a check for end as well as start but should be ok with this data
+            # e = d.split('-')[1]
+            # e = pd.to_datetime(e, format="%y%m%d%H%M%S")
+            if (s >= start and s <= end):
+                filenames_match.append(filename)
+
+    if not filenames:
+        raise ValueError(f"No filenames found for date range: {start} - {end}")
+
+    return filenames_match
+
+def extract_data(model, scenario, run, base_path=data_path, date_range=None, parameter="utci", resample="D", set_chunks=True):
     '''
     Extract data files for the model and scenario (based on expected directory structure):
 
@@ -52,8 +86,8 @@ def extract_data(model, scenario, run="r1i1p1f1", base_path=data_path, date_rang
 
     time_col = "time"
 
-    ## TODO: remove this temporary line
-    ##filenames = list(filenames)[0:2]
+    if date_range is not None:
+        filenames = extract_files(filenames, date_range[0], date_range[1])
 
     if set_chunks:
         data_combined = xr.open_mfdataset(filenames, concat_dim="time", chunks={'time': -1, 'lat': 10, 'lon':10})
@@ -61,11 +95,11 @@ def extract_data(model, scenario, run="r1i1p1f1", base_path=data_path, date_rang
             data_combined = data_combined[parameter]
         if resample:
             data_combined = data_combined.resample(indexer={time_col:resample}).mean()
-
-        print(data_combined)
+        
+        print("Reading data complete.")
     else:
+        data_combined = None
         for filename in filenames:
-
             #filename = next(filenames)
 
             with xr.open_dataset(filename) as ds:
@@ -134,7 +168,11 @@ def calc_climatology(data, time_col="time", percentile=None, quantile=0.95, set_
 
     data_quantile = data.groupby("month").map(calc_quantile, quantile = quantile)
     
-    time_as_strings = data[time_col].astype('M8[us]').dt.strftime("%Y-%m-%dT%H:%M:%S").sortby(time_col)
+    # Being awkward around different datetime formats for the different models - this allows date labels to be extracted from both.
+    try:
+        time_as_strings = data[time_col].dt.strftime("%Y-%m-%dT%H:%M:%S").sortby(time_col)
+    except ValueError:
+        time_as_strings = data[time_col].astype('M8[us]').dt.strftime("%Y-%m-%dT%H:%M:%S").sortby(time_col)
     data_quantile.attrs["timeframe"] = f"Climatology over time range: {time_as_strings.values[0]} - {time_as_strings.values[-1]}"
     data_quantile.attrs["quantile"] = f"Quantile calculated: {quantile} (i.e. {quantile*100.:.0f}% percentile)"
     
@@ -145,9 +183,9 @@ def define_output_name(path, model, scenario, date_range, percentile=95):
     filename = os.path.join(path, f"UTCI_climatology_p{percentile:.0f}_{model}_{scenario}_{date_range[0]}-{date_range[1]}.nc")
     return filename
 
-def define_output_name_diff(path, percentile=95):
+def define_output_name_diff(path, date_range1, date_range2, percentile=95):
     ''' Define output name for overall difference utci parameter '''
-    filename = os.path.join(path, f"UTCI_climatology_p{percentile:.0f}_difference.nc")
+    filename = os.path.join(path, f"UTCI_climatology_p{percentile:.0f}_difference_{date_range1[0]}-{date_range1[1]}_{date_range2[0]}-{date_range2[1]}.nc")
     return filename
 
 def read_previous_calculation(path, model, scenario, date_range, parameter = "utci", percentile = 95):
@@ -188,24 +226,37 @@ def read_previous_calculation(path, model, scenario, date_range, parameter = "ut
     else:
         return None
 
-def calc_percentile_difference(output_path, write_steps=True, set_chunks=True):
+def calc_percentile_difference(output_path, ref_date_range = ["1985", "2015"], scenario_date_range=["2071", "2101"], write_steps=True, set_chunks=True):
     '''
     Calculate the difference in the 95th percentile across the scenarios for each model.
 
     This calculate the monthly climatology across two 30 year periods, comparing each ssp 
     scenario to the historical data set.
 
-    historical dataset - from 1985-2014 (based on current data availability)
-    ssp scenario - from 2029-2058 (based on current data availability)
-    
-    models - "BCC-CSM2-MR"
+    models - "BCC-CSM2-MR", "HadGEM3-GC31-LL"
     scenarios - "ssp126", "ssp245", "ssp585"
 
     Args:
         output_path (str/pathlib.Path):
             Where to write output data from this calculation.
-        write_steps (bool) :
+        ref_date_range (list, optional) :
+            Start and end date (end non-inclusive) to extract and use for the reference dataset.
+            Should be specified in a recognised pandas date format e.g. "YYYY" or "YYYY-MM-DD"
+            Default = ["1985", "2015"] (1985-2014 years included)
+        scenario_date_range (list, optional) :
+            Start and end date (end non-inclusive) to extract and use for the scenario datasets.
+            Should be specified in a recognised pandas date format e.g. "YYYY" or "YYYY-MM-DD"
+            Default = ["2071", "2100"] (2071-2100 years included)
+        write_steps (bool, optional) :
             Whether to write out data after the percentile calculation for each model and scenario as well.
+            Default = True
+        set_chunks (bool, optional) :
+            Whether to explicitly specify chunks for dask to use. If set to True this will set
+            chunks = {"time": -1, "lat": 10, "lon": 10} which means this is not chunked along
+            the time dimension. This is preferable when performing operations along the time
+            dimension.
+            However, this did cause some issues when running on JASMIN sci nodes and made this very slow
+            / used a lot of memory (dask does sometimes get memory leaks). So see what works.
             Default = True
     
     Returns:
@@ -213,17 +264,17 @@ def calc_percentile_difference(output_path, write_steps=True, set_chunks=True):
             Difference data for the scenarios wihin each model as one combined DataArray object.
             coords: model, scenario, month, lat, lon
 
-    TODO: Hard-coded at the moment but can add more flexibility in future.
+    TODO: Some hard-coding at the moment but can add more flexibility in future.
     '''
     # Gathering together details for different models and scenarios we will be comparing
-    models = ["BCC-CSM2-MR"]#, "HadGEM3-GC31-LL"]
+    models = ["BCC-CSM2-MR", "HadGEM3-GC31-LL"]
     ssp_scenarios = ["ssp126", "ssp245", "ssp585"]
     reference_scenario = "historical" # Define folder name for data to use as the reference timeseries
+    runs = {"BCC-CSM2-MR":"r1i1p1f1", "HadGEM3-GC31-LL":"r1i1p1f3"} # Name of lowest level folder (run?)
 
-    ref_date_range = ["1985", "2014"]
-    scenario_date_range = ["2029", "2058"]
-
-    run = "r1i1p1f1" # Name of lowest level folder (run?)
+    #ref_date_range = ["1985", "2014"]
+    #scenario_date_range = ["2029", "2058"]
+    
     percentile=95
 
     # For each model process the historical data and data for each scenario (assumes same scenarios per model)
@@ -231,6 +282,7 @@ def calc_percentile_difference(output_path, write_steps=True, set_chunks=True):
     for model in models:
         # Calculate 95th percentile for reference (historical data)
         # Check if this already exists first
+        run = runs[model]
         utci_ref_95 = read_previous_calculation(output_path, model, reference_scenario, ref_date_range, parameter="utci")
         
         if utci_ref_95 is None:
@@ -275,7 +327,7 @@ def calc_percentile_difference(output_path, write_steps=True, set_chunks=True):
     # data_diff = data_diff.transpose(["month", "lat", "lon", "model", "scenario"])
     
     # Write difference DataArray out to file
-    filename = define_output_name_diff(output_path, percentile=95)
+    filename = define_output_name_diff(output_path, ref_date_range, scenario_date_range, percentile=95)
     data_diff.to_dataset().to_netcdf(filename)
 
     return data_diff
