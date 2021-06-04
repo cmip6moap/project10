@@ -1,4 +1,6 @@
 """
+Developed by: Rachel Tunnicliffe
+
 This module is used to read and process 3-hourly UTCI output derived from CMIP6 models.
 
 Function call
