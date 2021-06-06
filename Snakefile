@@ -14,7 +14,9 @@ ci = list(range(len(countries)))
 
 rule all:
   input:
-    "data/processed_data/utci_country_monthly.parquet"
+    "data/processed_data/utci_country_monthly.parquet",
+    "data/processed_data/mortality_prediction.parquet",
+    "results/mortality_prediction.pdf"
 
 rule utci_countries:
   input:
@@ -45,3 +47,12 @@ rule utci_countries_aggregate:
       l.append(pd.read_parquet(country))
     out = pd.concat(l)
     out.to_parquet(str(output), compression="gzip")
+
+rule mortality_prediction:
+  input:
+    "data/processed_data/utci_country_monthly.parquet"
+  output:
+    "data/processed_data/mortality_prediction.parquet",
+    "results/mortality_prediction.pdf"
+  notebook:
+    "notebooks/mortality_modelling.ipynb"
