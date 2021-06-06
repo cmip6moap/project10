@@ -4,10 +4,10 @@ import pandas as pd
 os.makedirs("data/processed_data/utci_country_monthly", exist_ok=True)
 os.makedirs("job_reports", exist_ok=True)
 
-combinationsfile = "data/processed_data/combinations.parquet.gz"
-popfile = "data/processed_data/populated.parquet.gz"
+combinationsfile = "data/processed_data/combinations.parquet"
+popfile = "data/processed_data/populated.parquet"
 combinations = pd.read_parquet(combinationsfile)
-populated = pd.read_parquet("data/processed_data/populated.parquet.gz")
+populated = pd.read_parquet("data/processed_data/populated.parquet")
 countries = list(set(populated['adm0name']))
 countries.sort()
 ci = list(range(len(countries)))
@@ -34,7 +34,7 @@ rule utci_countries:
 
 rule utci_countries_aggregate:
   input:
-    expand("data/processed_data/utci_country_monthly/utci_monthly_{country}.parquet.gz", country=ci),
+    expand("data/processed_data/utci_country_monthly/utci_monthly_{country}.parquet", country=ci),
   output:
     "data/processed_data/utci_country_monthly.parquet"
   run:
