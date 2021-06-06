@@ -4,7 +4,7 @@
 source /gws/pw/j05/cop26_hackathons/bristol/activate-env
 
 snakemake -prk \
--j 100 \
+-j 10 \
 --cluster-config slurm.json \
 --cluster "sbatch \
   --job-name={cluster.name} \

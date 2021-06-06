@@ -44,10 +44,10 @@ def country_utci(utci, popinfo, country, model="", scenario="", quantile=""):
             .reset_index(drop=True))
         l.append(out)
     out = pd.concat(l)
-    popsum = out.groupby('name').apply(lambda x: x['pop'].loc[0]).sum()
+    popsum = pop['pop'].sum()
     o = (out
          .assign(utci=out['pop'] * out['utci']/popsum)
-         .groupby(['year', 'month', 'adm0name', 'model', 'scenario', 'country'])
+         .groupby(['year', 'month', 'adm0name', 'model', 'scenario', 'quantile'])
          .agg({'utci':['sum']})
          .reset_index()
     )

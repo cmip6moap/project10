@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-os.makedirs("data/processed_data/utci_country_monthly/countries", exist_ok=True)
+os.makedirs("data/processed_data/utci_country_monthly", exist_ok=True)
 os.makedirs("job_reports", exist_ok=True)
 
 combinationsfile = "data/processed_data/combinations.parquet.gz"
@@ -14,14 +14,14 @@ ci = list(range(len(countries)))
 
 rule all:
   input:
-    expand("data/processed_data/countries/utci_monthly_{country}.parquet.gz", country=ci)
+    "data/processed_data/utci_country_monthly.parquet"
 
 rule utci_countries:
   input:
     expand("{combinationsfile}", combinationsfile=combinationsfile),
     expand("{popfile}", popfile=popfile)
   output:
-    "data/processed_data/countries/utci_monthly_{country}.parquet.gz"
+    "data/processed_data/utci_country_monthly/utci_monthly_{country}.parquet.gz"
   shell:
     """
       cd code
@@ -32,3 +32,16 @@ rule utci_countries:
         --outfile ../{output}
     """
 
+rule utci_countries_aggregate:
+  input:
+    expand("data/processed_data/utci_country_monthly/utci_monthly_{country}.parquet.gz", country=ci),
+  output:
+    "data/processed_data/utci_country_monthly.parquet"
+  run:
+    import pandas as pd
+    print(type(input))
+    l = []
+    for country in input:
+      l.append(pd.read_parquet(country))
+    out = pd.concat(l)
+    out.to_parquet(str(output), compression="gzip")
