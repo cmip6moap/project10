@@ -26,6 +26,14 @@ snakemake -prk \
   --output={cluster.output}"
 ```
 
+##
+
+## Notes
+
+- Using list of major towns and cities to obtain populated regions, whereas mortality is for entire countries
+- Some UN area names are different to the populated region names and so they are lost during merging
+- Assuming summer months are May-October in Northern hemisphere and November-April in the Southern hemisphere
+
 
 
 
