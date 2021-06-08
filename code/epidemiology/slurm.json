@@ -2,7 +2,7 @@
         "__default__" :
         {
                 "name": "{rule}",
-                "partition": "workshop",
+                "partition": "short-serial",
                 "nodes": "1",
                 "ncpu": "1",
                 "ntask": "1",

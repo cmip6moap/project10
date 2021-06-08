@@ -1,38 +1,41 @@
 import os
-os.makedirs("data/processed_data/utci_country_monthly", exist_ok=True)
+os.makedirs("../../data/processed_data/utci_country_monthly", exist_ok=True)
 os.makedirs("job_reports", exist_ok=True)
 
-combinationsfile = "data/processed_data/combinations.parquet"
+combinationsfile = "../../data/processed_data/combinations.parquet"
 
 rule all:
 	input:
-		"data/processed_data/combinations.parquet",
-		"data/processed_data/populated.parquet",
-		"data/processed_data/un_mortality.parquet"
+		"../../data/processed_data/combinations.parquet",
+		"../../data/processed_data/populated.parquet",
+		"../../data/processed_data/un_mortality.parquet"
 
 rule populated:
 	input:
-		"data/raw_data/ne_10m_populated_places_simple/ne_10m_populated_places_simple.shp"
+		"../../data/raw_data/ne_10m_populated_places_simple/ne_10m_populated_places_simple.shp"
 	output:
-		"data/processed_data/populated.parquet"
-	notebook:
-		"notebooks/obtain_populated_regions.ipynb"
+		"../../data/processed_data/populated.parquet"
+	shell:
+		"""
+		cd ../../notebooks
+		jupyter nbconvert --to notebook --execute epi_obtain_populated_regions.ipynb
+		"""
 
 rule combinations:
 	input:
-		"data/processed_data/populated.parquet"
+		"../../data/processed_data/populated.parquet"
 	output:
-		"data/processed_data/combinations.parquet"
+		"../../data/processed_data/combinations.parquet"
 	notebook:
-		"notebooks/generate_combinations.ipynb"
+		"../../notebooks/epi_generate_combinations.ipynb"
 
 rule mortality:
 	input:
-		"data/processed_data/populated.parquet",
-		"data/raw_data/UNdata_Export_20210603_104133027.csv.gz"
+		"../../data/processed_data/populated.parquet",
+		"../../data/raw_data/UNdata_Export_20210603_104133027.csv.gz"
 	output:
-		"data/processed_data/un_mortality.parquet"
+		"../../data/processed_data/un_mortality.parquet"
 	notebook:
-		"notebooks/organise_mortality.ipynb"
+		"../../notebooks/epi_organise_mortality.ipynb"
 
 
