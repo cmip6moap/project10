@@ -54,4 +54,4 @@ rule mortality_prediction:
     "../../data/processed_data/mortality_prediction.parquet",
     "../../results/mortality_prediction.pdf"
   notebook:
-    "../../notebooks/epi_mortality_modelling.ipynb"
+    "epi_mortality_modelling.ipynb"

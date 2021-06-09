@@ -12,30 +12,36 @@ rule all:
 
 rule populated:
 	input:
-		"../../data/raw_data/ne_10m_populated_places_simple/ne_10m_populated_places_simple.shp"
+		"../../data/raw_data/ne_10m_populated_places_simple/ne_10m_populated_places_simple.shp",
+		"epi_obtain_populated_regions.ipynb"
 	output:
 		"../../data/processed_data/populated.parquet"
-	shell:
-		"""
-		cd ../../notebooks
-		jupyter nbconvert --to notebook --execute epi_obtain_populated_regions.ipynb
-		"""
+	conda:
+		"cmip6"
+	notebook:
+		"epi_obtain_populated_regions.ipynb"
 
 rule combinations:
 	input:
+		"epi_generate_combinations.ipynb",
 		"../../data/processed_data/populated.parquet"
 	output:
 		"../../data/processed_data/combinations.parquet"
+	conda:
+		"cmip6"
 	notebook:
-		"../../notebooks/epi_generate_combinations.ipynb"
+		"epi_generate_combinations.ipynb"
 
 rule mortality:
 	input:
+		"epi_organise_mortality.ipynb",
 		"../../data/processed_data/populated.parquet",
 		"../../data/raw_data/UNdata_Export_20210603_104133027.csv.gz"
 	output:
 		"../../data/processed_data/un_mortality.parquet"
+	conda:
+		"cmip6"
 	notebook:
-		"../../notebooks/epi_organise_mortality.ipynb"
+		"epi_organise_mortality.ipynb"
 
 
